@@ -20,7 +20,23 @@ const getAllProperties = async () => {
 }
 
 const getPropertyById = async (propertyId: string) => {
-
+    const property = await prisma.property.findUnique(
+        {
+            where:{
+                id: propertyId
+            },
+            include:{
+                category: true,
+                landlord: {
+                    omit:{
+                        password: true
+                    },
+                },
+                reviews: true
+            }
+        }
+    )
+    return property;
 }
 
 const getCategories = async () => {
