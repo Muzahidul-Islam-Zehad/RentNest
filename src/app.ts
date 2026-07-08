@@ -4,6 +4,8 @@ import { authRouter } from "./modules/Authentication/authentication.route";
 import { globalErrorHandler } from "./middleware/globalErrorHandler";
 import cookieParser from "cookie-parser";
 import { propertyRouter } from "./modules/properties/properties.route";
+import { landlordsrouter } from "./modules/landLord/landLord.route";
+import { categoriesRouter } from "./modules/Categories/categories.route";
 
 
 const app: Application = express();
@@ -20,7 +22,8 @@ app.get('/', (req:Request, res: Response)=>{
 
 app.use("/api/auth", authRouter.router)
 app.use("/api/properties", propertyRouter.router)
-
+app.use("/api/landlords", landlordsrouter.router)
+app.use("/api/categories", categoriesRouter.router)
 
 
 app.use(globalErrorHandler);

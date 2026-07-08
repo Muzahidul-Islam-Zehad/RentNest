@@ -8,7 +8,7 @@ model Property {
   bedrooms        Int?
   bathrooms       Int?
   area            Float?     
-  amenities       Json?      
+  amenities       String[]      
   images          String[]   
   isAvailable     Boolean    @default(true)
   status          String     @default("ACTIVE") 
