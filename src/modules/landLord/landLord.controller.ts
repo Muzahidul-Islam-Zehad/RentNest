@@ -5,6 +5,7 @@ import { IPropertyListing } from "./landLord.interface";
 import { response } from "../../utils/sendResponse";
 import HttpStatus from "http-status";
 import { JwtPayload } from "jsonwebtoken";
+import { RentalStatus } from "../../../generated/prisma/client";
 
 
 const createPropertyListing = catchAsync(
@@ -64,9 +65,26 @@ const getAllRequestsByTenant = catchAsync(
     }
 )
 
+const updateRequestStatus = catchAsync(
+    async (req: Request, res: Response) => {
+        const requestId = req.params.id;
+        const { status } = req.body ;
+        const landlordId = req.user?.userId as JwtPayload["userId"];
+        const updatedRequest = await landlordsService.updateRequestStatusInDB(requestId as string, status, landlordId);
+
+        response(res, {
+            status: HttpStatus.OK,
+            success: true,
+            message: "Request status updated successfully",
+            data: updatedRequest
+        });
+    }
+)
+
 export const landLordsController = {
     createPropertyListing,
     getAllPropertyListingsByLandlord,
     updatePropertyListing,
-    getAllRequestsByTenant
+    getAllRequestsByTenant,
+    updateRequestStatus
 }

@@ -13,7 +13,7 @@ router.put("/properties/:id", authMiddleware("LANDLORD"), landLordsController.up
 
 router.get("/requests", authMiddleware("LANDLORD"), landLordsController.getAllRequestsByTenant)
 
-
+router.patch("/requests/:id", authMiddleware("LANDLORD"), landLordsController.updateRequestStatus)
 
 export const landlordsrouter = {
     router

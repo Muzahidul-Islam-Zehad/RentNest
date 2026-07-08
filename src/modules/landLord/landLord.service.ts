@@ -2,6 +2,7 @@ import { IPropertyListing } from "./landLord.interface";
 import { prisma } from "../../lib/prisma";
 import AppError from "../../utils/AppError";
 import httpStatus from "http-status";
+import { RentalStatus } from "../../../generated/prisma/enums";
 
 
 const createPropertyListingInDB = async (payload: IPropertyListing, landlordId: string) => {
@@ -114,9 +115,57 @@ const getAllRequestsByTenant = async (landlordId: string) => {
     return requests;
 }
 
+const updateRequestStatusInDB = async (requestId: string, status: string, landlordId: string) => {
+    if (!landlordId) {
+        throw new AppError("Unauthorized", httpStatus.UNAUTHORIZED);
+    }
+    if (!status) {
+        throw new AppError("Invalid request status", httpStatus.BAD_REQUEST);
+    }
+
+    const newStatus = status.toUpperCase() as RentalStatus;
+
+    if (!(newStatus in RentalStatus)) {
+        throw new AppError("Invalid request status", httpStatus.BAD_REQUEST);
+    }
+
+    const updateReqTransaction = await prisma.$transaction(
+        async (tx) => {
+
+            const request = await tx.rentalRequest.findUnique({
+                where: {
+                    id: requestId
+                }
+            });
+
+            if (!request) {
+                throw new AppError("Request not found", httpStatus.NOT_FOUND);
+            }
+
+            const updatedRequest = await prisma.rentalRequest.update({
+                where: {
+                    id: requestId,
+                    property: {
+                        landlordId
+                    }
+                },
+                data: {
+                    status: newStatus
+                },
+            });
+
+            return updatedRequest;
+        }
+    )
+
+
+    return updateReqTransaction;
+}
+
 export const landlordsService = {
     createPropertyListingInDB,
     getAllPropertyListingsByLandlord,
     updatePropertyListingInDB,
-    getAllRequestsByTenant
+    getAllRequestsByTenant,
+    updateRequestStatusInDB
 }   
