@@ -1,24 +1,28 @@
 import { Request, Response } from "express";
-import { IRegisterRequest } from "./authentication.interface";
+import { ILoginRequest, IRegisterRequest } from "./authentication.interface";
 import { prisma } from "../../lib/prisma";
 import bcrypt from "bcryptjs";
+import jwt, { SignOptions } from "jsonwebtoken";
+import { config } from "../../config";
+import httpStatus from "http-status";
+import AppError from "../../utils/AppError";
 
 
 const registerUser = async (payload: IRegisterRequest) => {
     const { email, password, role } = payload;
 
-    if(!email || !password || !role){
-        throw new Error("Email, password and role are required")
+    if (!email || !password || !role) {
+        throw new AppError("Email, password and role are required", httpStatus.BAD_REQUEST)
     }
-    const   newrole = role.toUpperCase()
-    if(newrole === "ADMIN"){
-        throw new Error("You cannot register as an admin")
+    const newrole = role.toUpperCase()
+    if (newrole === "ADMIN") {
+        throw new AppError("You cannot register as an admin", httpStatus.FORBIDDEN)
     }
-    if(newrole !== "TENANT" && newrole !== "LANDLORD") {
-        throw new Error("Invalid role. Please specify either 'TENANT' or 'LANDLORD'")
+    if (newrole !== "TENANT" && newrole !== "LANDLORD") {
+        throw new AppError("Invalid role. Please specify either 'TENANT' or 'LANDLORD'", httpStatus.BAD_REQUEST)
     }
 
-    const userTransaction = await prisma.$transaction( async (tx) =>{
+    const userTransaction = await prisma.$transaction(async (tx) => {
 
         const isUserExist = await tx.user.findUnique({
             where: {
@@ -26,8 +30,8 @@ const registerUser = async (payload: IRegisterRequest) => {
             }
         })
 
-        if(isUserExist){
-            throw new Error("User already exists")
+        if (isUserExist) {
+            throw new AppError("User already exists", httpStatus.CONFLICT)
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -38,7 +42,7 @@ const registerUser = async (payload: IRegisterRequest) => {
                 password: hashedPassword,
                 role: newrole
             },
-            omit:{
+            omit: {
                 password: true
             }
         })
@@ -46,14 +50,87 @@ const registerUser = async (payload: IRegisterRequest) => {
         return user
     })
 
-        
+
     return userTransaction
 
 }
+
+const loginUser = async (payload: ILoginRequest) => {
+    const { email, password } = payload;
+
+    if (!email || !password) {
+        throw new AppError("Email and password are required", httpStatus.BAD_REQUEST);
+    }
+
+    const userTransaction = await prisma.$transaction(async (tx) => {
+        const user = await tx.user.findUnique({
+            where: {
+                email
+            }
+        });
+
+        if (!user) {
+            throw new AppError("Invalid email or password", httpStatus.UNAUTHORIZED);
+        }
+
+        if (user.status === "BANNED") {
+            throw new AppError("Your account has been banned. Please contact support for assistance.", httpStatus.FORBIDDEN);
+        }
+
+        const isPasswordMatch = await bcrypt.compare(password, user.password);
+
+        if (!isPasswordMatch) {
+            throw new AppError("Invalid email or password", httpStatus.UNAUTHORIZED);
+        }
+
+        const accessToken = jwt.sign({ userId: user.id, email: user.email,status: user.status, role: user.role }, config
+            .jwt_access_token_secret as string, { expiresIn: config.jwt_access_token_expires_in } as SignOptions
+        );
+
+        const refreshToken = jwt.sign({ userId: user.id, email: user.email,status: user.status, role: user.role }, config
+            .jwt_refresh_token_secret as string, { expiresIn: config.jwt_refresh_token_expires_in } as SignOptions
+        );
+
+        console.log("Access Token:", accessToken);
+        console.log("Refresh Token:", refreshToken);
+        console.log("User:", user);
+
+        return {
+            user: {
+                ...user,
+                password: undefined
+            },
+            accessToken,
+            refreshToken
+        }
+
+    })
+
+    return userTransaction;
+
+    // const user = await prisma.user.findUnique({
+    //     where: {
+    //         email
+    //     }
+    // });
+
+    // if (!user) {
+    //     throw new Error("Invalid email or password");
+    // }
+
+    // const isPasswordMatch = await bcrypt.compare(password, user.password);
+
+    // if (!isPasswordMatch) {
+    //     throw new Error("Invalid email or password");
+    // }
+
+    // return user;
+};
 
 
 
 
 export const authServices = {
-    registerUser
+    registerUser,
+    loginUser
 }

@@ -5,6 +5,7 @@ import { authController } from "./authentication.controller";
 const router = Router()
 
 router.post('/register', authController.registerUser)
+router.post('/login', authController.loginUser)
 
 
 export const authRouter = {
