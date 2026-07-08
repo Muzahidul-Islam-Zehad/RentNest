@@ -1,5 +1,6 @@
 import { prisma } from "../../lib/prisma"
-
+import AppError from "../../utils/AppError";
+import httpStatus from "http-status";
 
 const getAllProperties = async () => {
     const properties = await prisma.property.findMany(
@@ -15,7 +16,11 @@ const getAllProperties = async () => {
             }
         }
     )
-        
+
+    if(!properties) {
+        throw new AppError("No properties found", httpStatus.NOT_FOUND);
+    }
+
     return properties;
 }
 
@@ -36,16 +41,14 @@ const getPropertyById = async (propertyId: string) => {
             }
         }
     )
+
+    if(!property) {
+        throw new AppError("Property not found", httpStatus.NOT_FOUND);
+    }
     return property;
 }
 
-const getCategories = async () => {
-
-}
-
-
 export const propertyServices = {
     getAllProperties,
-    getPropertyById,
-    getCategories
+    getPropertyById
 }

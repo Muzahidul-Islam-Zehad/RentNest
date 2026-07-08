@@ -29,8 +29,8 @@ const getPropertyById = catchAsync(
     }
 )
 
-
 export const propertyController = {
     getAllProperties,
     getPropertyById
+    
 }

@@ -6,7 +6,7 @@ import { authMiddleware } from "../../middleware/authMiddleware";
 const router= Router()
 
 router.post("/",authMiddleware("ADMIN") , categoriesController.createCategories)
-
+router.get("/", categoriesController.getCategories)
 
 export const categoriesRouter = {
     router

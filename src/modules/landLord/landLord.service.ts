@@ -7,6 +7,10 @@ import httpStatus from "http-status";
 const createPropertyListingInDB = async (payload: IPropertyListing, landlordId: string) => {
     const { title, description, location, city, price, categoryId, bedrooms, bathrooms, area, amenities, images } = payload;
 
+    if(!title || !description || !location || !city || !price || !images) {
+        throw new AppError("Missing required fields", httpStatus.BAD_REQUEST);
+    }
+
     if (!landlordId) {
         throw new AppError("Unauthorized", httpStatus.UNAUTHORIZED);
     }
@@ -44,6 +48,7 @@ const createPropertyListingInDB = async (payload: IPropertyListing, landlordId: 
 
     return newPropertyListing;
 }
+
 
 
 export const landlordsService = {
