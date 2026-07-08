@@ -22,6 +22,51 @@ const createPropertyListing = catchAsync(
     }
 )
 
+const getAllPropertyListingsByLandlord = catchAsync(
+    async (req: Request, res: Response) => {
+        const landlordId = req.user?.userId as JwtPayload["userId"];
+        const listings = await landlordsService.getAllPropertyListingsByLandlord(landlordId);
+        response(res, {
+            status: HttpStatus.OK,
+            success: true,
+            message: "Property listings fetched successfully",
+            data: listings
+        });
+    }
+)   
+
+const updatePropertyListing = catchAsync(
+    async (req: Request, res: Response) => {
+        const propertyId = req.params.id;
+        const payload = req.body as IPropertyListing;
+        const landlordId = req.user?.userId as JwtPayload["userId"];
+        const updatedListing = await landlordsService.updatePropertyListingInDB(propertyId as string, payload, landlordId);
+
+        response(res, {
+            status: HttpStatus.OK,
+            success: true,
+            message: "Property listing updated successfully",
+            data: updatedListing
+        });
+    }
+)
+
+const getAllRequestsByTenant = catchAsync(
+    async (req: Request, res: Response) => {
+        const landlordId = req.user?.userId as JwtPayload["userId"];
+        const requests = await landlordsService.getAllRequestsByTenant(landlordId);
+        response(res, {
+            status: HttpStatus.OK,
+            success: true,
+            message: "Tenant requests fetched successfully",
+            data: requests
+        });
+    }
+)
+
 export const landLordsController = {
-    createPropertyListing
+    createPropertyListing,
+    getAllPropertyListingsByLandlord,
+    updatePropertyListing,
+    getAllRequestsByTenant
 }

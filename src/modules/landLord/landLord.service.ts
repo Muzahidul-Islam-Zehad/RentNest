@@ -7,7 +7,7 @@ import httpStatus from "http-status";
 const createPropertyListingInDB = async (payload: IPropertyListing, landlordId: string) => {
     const { title, description, location, city, price, categoryId, bedrooms, bathrooms, area, amenities, images } = payload;
 
-    if(!title || !description || !location || !city || !price || !images) {
+    if (!title || !description || !location || !city || !price || !images) {
         throw new AppError("Missing required fields", httpStatus.BAD_REQUEST);
     }
 
@@ -49,8 +49,74 @@ const createPropertyListingInDB = async (payload: IPropertyListing, landlordId: 
     return newPropertyListing;
 }
 
+const getAllPropertyListingsByLandlord = async (landlordId: string) => {
+    if (!landlordId) {
+        throw new AppError("Unauthorized", httpStatus.UNAUTHORIZED);
+    }
 
+    const listings = await prisma.property.findMany({
+        where: {
+            landlordId
+        },
+        include: {
+            category: true,
+            landlord: {
+                omit: {
+                    password: true,
+                },
+            },
+        },
+    });
+
+    return listings;
+}
+
+const updatePropertyListingInDB = async (propertyId: string, payload: Partial<IPropertyListing>, landlordId: string) => {
+    if (!landlordId) {
+        throw new AppError("Unauthorized", httpStatus.UNAUTHORIZED);
+    }
+
+    const updatedListing = await prisma.property.update({
+        where: {
+            id: propertyId,
+            landlordId
+        },
+        data: payload
+    });
+
+    return updatedListing;
+}
+
+const getAllRequestsByTenant = async (landlordId: string) => {
+    if (!landlordId) {
+        throw new AppError("Unauthorized", httpStatus.UNAUTHORIZED);
+    }
+    const requests = await prisma.property.findMany({
+        where: {
+            landlordId,
+            rentalRequests: {
+                some: {}
+            }
+        },
+        include: {
+            rentalRequests: {
+                include: {
+                    tenant: {
+                        omit: {
+                            password: true,
+                        },
+                    },
+                },
+            },
+        }
+    })
+
+    return requests;
+}
 
 export const landlordsService = {
-    createPropertyListingInDB
-}
+    createPropertyListingInDB,
+    getAllPropertyListingsByLandlord,
+    updatePropertyListingInDB,
+    getAllRequestsByTenant
+}   
