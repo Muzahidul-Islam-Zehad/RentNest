@@ -3,6 +3,7 @@ import cors from "cors";
 import { authRouter } from "./modules/Authentication/authentication.route";
 import { globalErrorHandler } from "./middleware/globalErrorHandler";
 import cookieParser from "cookie-parser";
+import { propertyRouter } from "./modules/properties/properties.route";
 
 
 const app: Application = express();
@@ -18,6 +19,7 @@ app.get('/', (req:Request, res: Response)=>{
 })
 
 app.use("/api/auth", authRouter.router)
+app.use("/api/properties", propertyRouter.router)
 
 
 

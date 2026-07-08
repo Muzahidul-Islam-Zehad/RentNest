@@ -10,6 +10,7 @@ const registerUser = catchAsync(async (req: Request, res: Response) => {
     const result = await authServices.registerUser(payload);
     response(res, {
         status: httpStatus.CREATED,
+        success: true,
         message: "User registered successfully",
         data: result
     })
@@ -35,6 +36,7 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
 
     response(res, {
         status: httpStatus.OK,
+        success: true,      
         message: "User logged in successfully",
         data: { accessToken, refreshToken }
     })
@@ -46,6 +48,7 @@ const getCurrentUser = catchAsync(async (req: Request, res: Response) => {
     const user = await authServices.getMe(userId);
     response(res, {
         status: httpStatus.OK,
+        success: true,
         message: "User retrieved successfully",
         data: user
     })
