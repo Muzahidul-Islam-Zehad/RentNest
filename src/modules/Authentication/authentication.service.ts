@@ -83,23 +83,15 @@ const loginUser = async (payload: ILoginRequest) => {
             throw new AppError("Invalid email or password", httpStatus.UNAUTHORIZED);
         }
 
-        const accessToken = jwt.sign({ userId: user.id, email: user.email,status: user.status, role: user.role }, config
+        const accessToken = jwt.sign({ userId: user.id, email: user.email, status: user.status, role: user.role }, config
             .jwt_access_token_secret as string, { expiresIn: config.jwt_access_token_expires_in } as SignOptions
         );
 
-        const refreshToken = jwt.sign({ userId: user.id, email: user.email,status: user.status, role: user.role }, config
+        const refreshToken = jwt.sign({ userId: user.id, email: user.email, status: user.status, role: user.role }, config
             .jwt_refresh_token_secret as string, { expiresIn: config.jwt_refresh_token_expires_in } as SignOptions
         );
-
-        console.log("Access Token:", accessToken);
-        console.log("Refresh Token:", refreshToken);
-        console.log("User:", user);
-
+        
         return {
-            user: {
-                ...user,
-                password: undefined
-            },
             accessToken,
             refreshToken
         }

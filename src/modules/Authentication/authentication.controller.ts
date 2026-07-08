@@ -16,11 +16,26 @@ const registerUser = catchAsync(async (req: Request, res: Response) => {
 
 const loginUser = catchAsync(async (req: Request, res: Response) => {
     const payload = req.body;
-    const result = await authServices.loginUser(payload);
+    const { accessToken, refreshToken } = await authServices.loginUser(payload);
+
+    res.cookie("accessToken", accessToken, {
+        httpOnly: true,
+        secure: false,
+        sameSite: "none",
+        maxAge: 24 * 60 * 60 * 1000 // 1 day
+    });
+
+    res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: false,
+        sameSite: "none",
+        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    });
+
     response(res, {
         status: httpStatus.OK,
         message: "User logged in successfully",
-        data: result
+        data: { accessToken, refreshToken }
     })
 
 })
