@@ -1,9 +1,17 @@
 import app from "./app";
+import { config } from "./config";
 
-function main(){
-    app.listen(3000, () => {
-        console.log("Server is running on port 3000");
-    });
+const PORT = config.port;
+
+const main = async () => {
+    try {
+        app.listen(PORT, () => {
+            console.log(`Server is running on port ${PORT}`);
+        });
+    }
+    catch (err) {
+        console.error("Error starting the server:", err);
+    }
 }
 
 main();

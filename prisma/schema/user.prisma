@@ -1,0 +1,21 @@
+model User {
+  id            String     @id @default(cuid())
+  name          String
+  email         String     @unique
+  password      String
+  role          UserRole
+  phone         String?
+  address       String?
+  avatar        String?
+  isActive      Boolean    @default(true)
+  isBanned      Boolean    @default(false)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  // Relations
+  properties    Property[]       // As Landlord
+  rentalRequests RentalRequest[] // As Tenant
+  reviews       Review[]         // As Tenant
+
+  @@map("users")
+}
