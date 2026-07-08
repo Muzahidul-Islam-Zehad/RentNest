@@ -3,6 +3,7 @@ import { authServices } from "./authentication.service";
 import { response } from "../../utils/sendResponse";
 import httpStatus from "http-status";
 import catchAsync from "../../utils/catchAsync";
+import { JwtPayload } from "jsonwebtoken";
 
 const registerUser = catchAsync(async (req: Request, res: Response) => {
     const payload = req.body;
@@ -40,7 +41,18 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
 
 })
 
+const getCurrentUser = catchAsync(async (req: Request, res: Response) => {
+    const userId = req.user?.userId as JwtPayload["userId"];
+    const user = await authServices.getMe(userId);
+    response(res, {
+        status: httpStatus.OK,
+        message: "User retrieved successfully",
+        data: user
+    })
+})
+
 export const authController = {
     registerUser,
-    loginUser
+    loginUser,
+    getCurrentUser
 }

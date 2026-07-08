@@ -6,6 +6,7 @@ import jwt, { SignOptions } from "jsonwebtoken";
 import { config } from "../../config";
 import httpStatus from "http-status";
 import AppError from "../../utils/AppError";
+import { createAccessToken, createRefreshToken } from "../../utils/jwt";
 
 
 const registerUser = async (payload: IRegisterRequest) => {
@@ -83,14 +84,11 @@ const loginUser = async (payload: ILoginRequest) => {
             throw new AppError("Invalid email or password", httpStatus.UNAUTHORIZED);
         }
 
-        const accessToken = jwt.sign({ userId: user.id, email: user.email, status: user.status, role: user.role }, config
-            .jwt_access_token_secret as string, { expiresIn: config.jwt_access_token_expires_in } as SignOptions
-        );
-
-        const refreshToken = jwt.sign({ userId: user.id, email: user.email, status: user.status, role: user.role }, config
-            .jwt_refresh_token_secret as string, { expiresIn: config.jwt_refresh_token_expires_in } as SignOptions
-        );
         
+        const accessToken = createAccessToken({ userId: user.id, email: user.email, status: user.status, role: user.role })
+
+        const refreshToken = createRefreshToken({ userId: user.id, email: user.email, status: user.status, role: user.role })
+
         return {
             accessToken,
             refreshToken
@@ -120,9 +118,33 @@ const loginUser = async (payload: ILoginRequest) => {
 };
 
 
+const getMe = async(userId: string) =>{
+    if(!userId) {
+        throw new AppError("User not found", httpStatus.BAD_REQUEST);
+    }
+    const user = await prisma.user.findUnique({
+        where: {
+            id : userId,
+        },
+        omit:{
+            password: true
+        },
+        include: {
+            profile: true,
+        }
+    })
+
+    if(!user){
+        throw new AppError("User not found", httpStatus.NOT_FOUND);
+    }
+
+    return user;
+}
+
 
 
 export const authServices = {
     registerUser,
-    loginUser
+    loginUser,
+    getMe
 }
