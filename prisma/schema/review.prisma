@@ -1,5 +1,5 @@
 model Review {
-  id          String   @id @default(cuid())
+  id          String   @id @default(uuid())
   tenantId    String
   propertyId  String
   rating      Int      @default(5) 
