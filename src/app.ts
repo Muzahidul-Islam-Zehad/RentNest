@@ -9,6 +9,7 @@ import { categoriesRouter } from "./modules/Categories/categories.route";
 import { rentalRouter } from "./modules/Rentals/rentals.route";
 import { reviewsRouter } from "./modules/Reviews/reviews.route";
 import { paymentsRouter } from "./modules/Payments/payments.route";
+import { adminRouter } from "./modules/Admin/admin.route";
 
 
 const app: Application = express();
@@ -31,6 +32,7 @@ app.use("/api/categories", categoriesRouter.router)
 app.use("/api/rentals", rentalRouter.router)
 app.use("/api/reviews", reviewsRouter.router)
 app.use("/api/payments", paymentsRouter.router)
+app.use("/api/admin", adminRouter.router)
 
 
 app.use(globalErrorHandler);
