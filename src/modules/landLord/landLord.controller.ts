@@ -81,10 +81,26 @@ const updateRequestStatus = catchAsync(
     }
 )
 
+const updatePropertyStatus = catchAsync(
+    async (req: Request, res: Response) => {
+        const propertyId = req.params.id;
+        const { status } = req.body;
+        const landlordId = req.user?.userId as JwtPayload["userId"];
+        const updatedProperty = await landlordsService.updatePropertyStatusInDB(propertyId as string, status, landlordId);
+        response(res, {
+            status: HttpStatus.OK,
+            success: true,
+            message: "Property status updated successfully",
+            data: updatedProperty
+        });
+    }
+)
+
 export const landLordsController = {
     createPropertyListing,
     getAllPropertyListingsByLandlord,
     updatePropertyListing,
     getAllRequestsByTenant,
-    updateRequestStatus
+    updateRequestStatus,
+    updatePropertyStatus
 }

@@ -264,6 +264,7 @@ const handleWebhookInDB = async (rawBody: Buffer | string, signature: string) =>
 					confirmationMode: "webhook",
 				},
 			},
+
 		});
 
 		await tx.rentalRequest.update({
@@ -340,3 +341,5 @@ export const paymentsService = {
 	getMyPaymentsInDB,
 	getPaymentByIdInDB,
 };
+
+

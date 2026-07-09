@@ -15,6 +15,7 @@ router.get("/requests", authMiddleware("LANDLORD"), landLordsController.getAllRe
 
 router.patch("/requests/:id", authMiddleware("LANDLORD"), landLordsController.updateRequestStatus)
 
+router.patch("/properties/:id/status", authMiddleware("LANDLORD"), landLordsController.updatePropertyStatus)
 export const landlordsrouter = {
     router
 }

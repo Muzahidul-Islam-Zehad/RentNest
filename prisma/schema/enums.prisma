@@ -28,3 +28,9 @@ enum PaymentStatus {
 enum PaymentProvider {
   STRIPE
 }
+
+enum propertyStatus {
+  ACTIVE
+  RENTED
+  UNDER_MAINTENANCE
+}

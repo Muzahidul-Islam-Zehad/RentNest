@@ -11,7 +11,7 @@ model Property {
   amenities       String[]      
   images          String[]   
   isAvailable     Boolean    @default(true)
-  status          String     @default("ACTIVE") 
+  status          propertyStatus @default(ACTIVE)
 
   landlordId      String
   categoryId      String

@@ -2,7 +2,7 @@ import { IPropertyListing, IUpdateRequestStatus } from "./landLord.interface";
 import { prisma } from "../../lib/prisma";
 import AppError from "../../utils/AppError";
 import httpStatus from "http-status";
-import { RentalStatus } from "../../../generated/prisma/enums";
+import { propertyStatus, RentalStatus } from "../../../generated/prisma/enums";
 
 
 const createPropertyListingInDB = async (payload: IPropertyListing, landlordId: string) => {
@@ -66,6 +66,7 @@ const getAllPropertyListingsByLandlord = async (landlordId: string) => {
                     password: true,
                 },
             },
+            reviews: true,
         },
     });
 
@@ -163,10 +164,41 @@ const updateRequestStatusInDB = async (requestId: string, payload: IUpdateReques
     return updateReqTransaction;
 }
 
+const updatePropertyStatusInDB = async (propertyId: string, status: string, landlordId: string) => {
+    if (!landlordId) {
+        throw new AppError("Unauthorized", httpStatus.UNAUTHORIZED);
+    }
+    if (!status) {
+        throw new AppError("Invalid property status", httpStatus.BAD_REQUEST);
+    }
+
+
+    const newStatus= status.toUpperCase() as propertyStatus;
+
+
+    if(newStatus !== propertyStatus.ACTIVE && newStatus !== propertyStatus.RENTED && newStatus !== propertyStatus.UNDER_MAINTENANCE) {
+        throw new AppError("Invalid property status", httpStatus.BAD_REQUEST);
+    }
+
+    const updatedProperty = await prisma.property.update({
+        where: {
+            id: propertyId,
+            landlordId
+        },
+        data: {
+            status: newStatus,
+            isAvailable: newStatus === propertyStatus.ACTIVE ? true : false
+        },
+    });
+
+    return updatedProperty;
+}
+
 export const landlordsService = {
     createPropertyListingInDB,
     getAllPropertyListingsByLandlord,
     updatePropertyListingInDB,
+    updatePropertyStatusInDB, 
     getAllRequestsByTenant,
     updateRequestStatusInDB
 }   
