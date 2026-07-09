@@ -7,6 +7,7 @@ import { propertyRouter } from "./modules/properties/properties.route";
 import { landlordsrouter } from "./modules/landLord/landLord.route";
 import { categoriesRouter } from "./modules/Categories/categories.route";
 import { rentalRouter } from "./modules/Rentals/rentals.route";
+import { reviewsRouter } from "./modules/Reviews/reviews.route";
 
 
 const app: Application = express();
@@ -26,6 +27,7 @@ app.use("/api/properties", propertyRouter.router)
 app.use("/api/landlords", landlordsrouter.router)
 app.use("/api/categories", categoriesRouter.router)
 app.use("/api/rentals", rentalRouter.router)
+app.use("/api/reviews", reviewsRouter.router)
 
 
 app.use(globalErrorHandler);
