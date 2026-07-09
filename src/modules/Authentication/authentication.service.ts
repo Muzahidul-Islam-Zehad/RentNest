@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { ILoginRequest, IRegisterRequest } from "./authentication.interface";
+import { ILoginRequest, IRegisterRequest, IUpdateUserRequest } from "./authentication.interface";
 import { prisma } from "../../lib/prisma";
 import bcrypt from "bcryptjs";
 import jwt, { SignOptions } from "jsonwebtoken";
@@ -141,10 +141,37 @@ const getMe = async(userId: string) =>{
     return user;
 }
 
+const updateMe = async(userId: string, payload: IUpdateUserRequest) =>{
+    const { name, phone, address, avatar } = payload;
+    if(!userId) {
+        throw new AppError("User not found", httpStatus.BAD_REQUEST);
+    }
+    const updatedUser = await prisma.userProfile.upsert({
+        where: {
+            userId
+        },
+        update: {
+            name,
+            phone,
+            address,
+            avatar
+        },
+        create: {
+            userId,
+            name,
+            phone,
+            address,
+            avatar
+        }
+    })
+
+    return updatedUser;
+}
 
 
 export const authServices = {
     registerUser,
     loginUser,
-    getMe
+    getMe,
+    updateMe
 }

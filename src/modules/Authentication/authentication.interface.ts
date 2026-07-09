@@ -11,3 +11,11 @@ export interface IRegisterRequest {
   password: string;
   role: UserRole;
 }
+
+
+export interface IUpdateUserRequest {
+  name?: string;
+  phone?: string;
+  address?: string;
+  avatar?: string;
+}

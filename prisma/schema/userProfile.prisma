@@ -2,7 +2,7 @@ model UserProfile {
   id        String   @id @default(uuid())
   userId    String   @unique
 
-  name      String
+  name      String?
   phone     String?
   address   String?
   avatar    String?

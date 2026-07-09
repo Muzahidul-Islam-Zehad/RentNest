@@ -24,14 +24,14 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
         httpOnly: true,
         secure: false,
         sameSite: "none",
-        maxAge: 24 * 60 * 60 * 1000 // 1 day
+        maxAge: 24 * 60 * 60 * 1000
     });
 
     res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
         secure: false,
         sameSite: "none",
-        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+        maxAge: 7 * 24 * 60 * 60 * 1000 
     });
 
     response(res, {
@@ -54,8 +54,21 @@ const getCurrentUser = catchAsync(async (req: Request, res: Response) => {
     })
 })
 
+const updateCurrentUser = catchAsync(async (req: Request, res: Response) => {
+    const userId = req.user?.userId as JwtPayload["userId"];
+    const payload = req.body;
+    const updatedUser = await authServices.updateMe(userId, payload);
+    response(res, {
+        status: httpStatus.OK,
+        success: true,
+        message: "User updated successfully",
+        data: updatedUser
+    })
+})
+
 export const authController = {
     registerUser,
     loginUser,
-    getCurrentUser
+    getCurrentUser,
+    updateCurrentUser
 }
