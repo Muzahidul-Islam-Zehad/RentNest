@@ -3,10 +3,13 @@ import catchAsync from "../../utils/catchAsync";
 import { response } from "../../utils/sendResponse";
 import { propertyServices } from "./properties.service";
 import httpStatus from "http-status";
+import { PropertyFilters } from "./properties.interface";
 
 const getAllProperties = catchAsync(
     async (req: Request, res: Response) => {
-        const properties = await propertyServices.getAllProperties();
+        const query = req.query;
+        console.log(query)
+        const properties = await propertyServices.getAllProperties(query as PropertyFilters);
         response(res, {
             status: httpStatus.OK,
             success: true,
