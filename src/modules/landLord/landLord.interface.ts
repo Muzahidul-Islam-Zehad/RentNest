@@ -11,3 +11,8 @@ export interface IPropertyListing {
     amenities?: string[];
     images: string[];
 }
+
+export interface IUpdateRequestStatus {
+    status: string;
+    rejectionReason?: string;
+}

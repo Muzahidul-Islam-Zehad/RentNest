@@ -1,4 +1,4 @@
-import { IPropertyListing } from "./landLord.interface";
+import { IPropertyListing, IUpdateRequestStatus } from "./landLord.interface";
 import { prisma } from "../../lib/prisma";
 import AppError from "../../utils/AppError";
 import httpStatus from "http-status";
@@ -115,17 +115,17 @@ const getAllRequestsByTenant = async (landlordId: string) => {
     return requests;
 }
 
-const updateRequestStatusInDB = async (requestId: string, status: string, landlordId: string) => {
+const updateRequestStatusInDB = async (requestId: string, payload: IUpdateRequestStatus, landlordId: string) => {
     if (!landlordId) {
         throw new AppError("Unauthorized", httpStatus.UNAUTHORIZED);
     }
-    if (!status) {
+    if (!payload.status) {
         throw new AppError("Invalid request status", httpStatus.BAD_REQUEST);
     }
 
-    const newStatus = status.toUpperCase() as RentalStatus;
+    const newStatus = payload.status.toUpperCase() as RentalStatus;
 
-    if (!(newStatus in RentalStatus)) {
+    if (newStatus !== RentalStatus.APPROVED && newStatus !== RentalStatus.REJECTED) {
         throw new AppError("Invalid request status", httpStatus.BAD_REQUEST);
     }
 
@@ -150,7 +150,8 @@ const updateRequestStatusInDB = async (requestId: string, status: string, landlo
                     }
                 },
                 data: {
-                    status: newStatus
+                    status: newStatus,
+                    rejectionReason: newStatus === RentalStatus.REJECTED ? payload.rejectionReason : null
                 },
             });
 

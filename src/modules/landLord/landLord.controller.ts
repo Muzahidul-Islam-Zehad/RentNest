@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import catchAsync from "../../utils/catchAsync";
 import { landlordsService } from "./landLord.service";
-import { IPropertyListing } from "./landLord.interface";
+import { IPropertyListing, IUpdateRequestStatus } from "./landLord.interface";
 import { response } from "../../utils/sendResponse";
 import HttpStatus from "http-status";
 import { JwtPayload } from "jsonwebtoken";
@@ -68,9 +68,9 @@ const getAllRequestsByTenant = catchAsync(
 const updateRequestStatus = catchAsync(
     async (req: Request, res: Response) => {
         const requestId = req.params.id;
-        const { status } = req.body ;
+        const payload = req.body as IUpdateRequestStatus;
         const landlordId = req.user?.userId as JwtPayload["userId"];
-        const updatedRequest = await landlordsService.updateRequestStatusInDB(requestId as string, status, landlordId);
+        const updatedRequest = await landlordsService.updateRequestStatusInDB(requestId as string, payload, landlordId);
 
         response(res, {
             status: HttpStatus.OK,
