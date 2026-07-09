@@ -8,6 +8,7 @@ import { landlordsrouter } from "./modules/landLord/landLord.route";
 import { categoriesRouter } from "./modules/Categories/categories.route";
 import { rentalRouter } from "./modules/Rentals/rentals.route";
 import { reviewsRouter } from "./modules/Reviews/reviews.route";
+import { paymentsRouter } from "./modules/Payments/payments.route";
 
 
 const app: Application = express();
@@ -15,6 +16,7 @@ const app: Application = express();
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use("/api/payments/webhook", express.raw({ type: "application/json" }));
 app.use(express.json());
 
 
@@ -28,6 +30,7 @@ app.use("/api/landlords", landlordsrouter.router)
 app.use("/api/categories", categoriesRouter.router)
 app.use("/api/rentals", rentalRouter.router)
 app.use("/api/reviews", reviewsRouter.router)
+app.use("/api/payments", paymentsRouter.router)
 
 
 app.use(globalErrorHandler);

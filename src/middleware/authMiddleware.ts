@@ -34,7 +34,6 @@ export const authMiddleware = (...roles: UserRole[]) => {
         }
 
         req.user = decoded;
-        console.log(decoded)
 
         next();
     })

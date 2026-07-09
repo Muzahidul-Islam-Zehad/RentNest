@@ -21,14 +21,14 @@ const postReviewInDB = async (reviewData: IPostReview, tenantId: string, propert
             where: {
                 propertyId,
                 tenantId,
-                status: RentalStatus.APPROVED,
+                status: RentalStatus.COMPLETED,
                 payment: {
                     status: PaymentStatus.COMPLETED
                 }
             }
         })
         if (!isCompletedRequestExists) {
-            throw new AppError("You haven't paid for this property yet, you can only review after payment", HttpStatus.BAD_REQUEST);
+            throw new AppError("You can only review after a completed rental", HttpStatus.BAD_REQUEST);
         }
 
         const existingReview = await tx.review.findFirst({
