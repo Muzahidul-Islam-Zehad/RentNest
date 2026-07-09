@@ -33,7 +33,22 @@ const getRentalRequestsByTenant = catchAsync(
     }
 );
 
+const getRentalRequestById = catchAsync(
+    async (req, res) => {
+        const rentalRequestId = req.params.id;
+        const tenantId = req.user?.userId as JwtPayload["userId"];
+        const result = await rentalService.getRentalRequestByIdInDB(rentalRequestId as string, tenantId);
+        response(res, {
+            status: HttpStatus.OK,
+            success: true,
+            message: "Rental request retrieved successfully",
+            data: result,
+        });
+    }
+)
+
 export const rentalController = {
     submitRentalRequest,
-    getRentalRequestsByTenant
-};
+    getRentalRequestsByTenant,
+    getRentalRequestById
+};  
